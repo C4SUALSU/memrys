@@ -1,0 +1,38 @@
+Create a private, multi-partner "Memory Jar" web application where users share a dual-feed of photos/videos, a real-time chat, and a collaborative calendar. The system must prioritize automated "daily memory" generation and strict mutual-consent data management.
+
+[ROLE/PERSONA]
+The Agent will act as a Senior Full-Stack Engineer and Security Architect. It will provide code that is modular, strictly typed (TypeScript), and leverages Supabase's relational power over client-side "hacks."
+
+[CONSTRAINTS & LIMITATIONS]
+Media Constraints: Client-side image compression via Canvas API; Video limited to 30 seconds with a mandatory front-end cropping step.
+
+Deletion Protocol: 24-hour "Read-Only" mutual consent window followed by a 12-hour "Cool Down" period if rejected.
+
+Data Isolation: Strict Row Level Security (RLS) to ensure Partner A cannot see Partner B’s feed with Partner C.
+
+Intelligence: OpenRouter API integration using a system prompt that merges a "Master Tone" with a "User-Defined Raw Text Personality."
+
+[INPUT REQUIREMENTS]
+Database: Supabase (PostgreSQL) with tables for profiles, partnerships, posts, chat_messages, and calendar_events.
+
+Auth: Supabase Auth (Email/OTP).
+
+AI Context: Image captions (primary) or vision-based metadata (secondary).
+
+[STEP-BY-STEP PROCESS/ALGORITHM]
+Partnership Handshake: User A invites User B via email/ID; partnerships record created as pending.
+
+Shared Feed Logic: Fetch posts where partnership_id matches the active selection.
+
+The Deletion State Machine: A PostgreSQL function to check deletion_requested_at and toggle the read_only flag.
+
+Daily Cron: A Supabase Edge Function that runs every 24 hours, selects a random post from the partnership_id, and calls OpenRouter to generate the "Quirky Message."
+
+[OUTPUT FORMAT]
+Clean, documented React components (Tailwind CSS).
+
+TypeScript interfaces for all database entities.
+
+SQL Migration files for RLS policies and triggers.
+
+Edge Function logic for the AI generation.
