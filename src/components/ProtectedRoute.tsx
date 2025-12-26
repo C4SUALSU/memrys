@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { user, loading } = useAuth()
 
-    console.log('ProtectedRoute: loading:', loading, 'user:', user?.email)
+    console.log('ProtectedRoute: URL:', window.location.href, 'loading:', loading, 'user:', user?.email)
 
     if (loading) {
         console.log('ProtectedRoute: Loading state, showing spinner...')

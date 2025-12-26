@@ -19,12 +19,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         let mounted = true
 
+        console.log('AuthProvider: Global mounted at:', window.location.href)
+
         // HELPER: Check if URL has auth parameters (Magic Link, etc)
         const hasAuthParams = () => {
             const hash = window.location.hash
             const search = window.location.search
-            return (hash && (hash.includes('access_token=') || hash.includes('type=recovery'))) ||
+            const found = (hash && (hash.includes('access_token=') || hash.includes('type=recovery'))) ||
                 (search && (search.includes('code=') || search.includes('error=')))
+
+            console.log('AuthProvider: Checking params:', {
+                hash,
+                search,
+                found
+            })
+            return found
         }
 
         console.log('AuthProvider: Mounted. Has hash token:', !!hasAuthParams())
