@@ -13,7 +13,9 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
+        console.log('LoginPage: Mounted. authLoading:', authLoading, 'User:', user?.email)
         if (!authLoading && user) {
+            console.log('LoginPage: Authenticated user detected, redirecting to dashboard...')
             navigate('/', { replace: true })
         }
     }, [user, authLoading, navigate])

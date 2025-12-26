@@ -18,13 +18,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         let mounted = true
+        console.log('AuthProvider: Mounted')
 
         async function getInitialSession() {
-            const { data: { session } } = await supabase.auth.getSession()
+            console.log('AuthProvider: Fetching initial session...')
+            const { data: { session }, error } = await supabase.auth.getSession()
+
+            if (error) {
+                console.error('AuthProvider: getSession error:', error.message)
+            }
+
             if (mounted) {
                 if (session) {
+                    console.log('AuthProvider: Session found for user:', session.user.email)
                     setSession(session)
                     setUser(session.user)
+                } else {
+                    console.log('AuthProvider: No initial session found')
                 }
                 setLoading(false)
             }
@@ -34,7 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            (event, session) => {
+                console.log('AuthProvider: authStateChange event:', event, 'Session present:', !!session)
                 if (mounted) {
                     setSession(session)
                     setUser(session?.user ?? null)
@@ -44,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         )
 
         return () => {
+            console.log('AuthProvider: Unmounting')
             mounted = false
             subscription.unsubscribe()
         }
