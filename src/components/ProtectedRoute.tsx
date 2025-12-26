@@ -20,7 +20,19 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
 
     if (!user) {
-        console.log('ProtectedRoute: No user found, redirecting to /login')
+        // Double check: if there is a hash token, keep loading (Supabase might still be processing it)
+        const hasHashToken = window.location.hash && window.location.hash.includes('access_token=')
+
+        if (hasHashToken) {
+            console.log('ProtectedRoute: No user yet, but hash token detected. Staying in loading state...')
+            return (
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                </div>
+            )
+        }
+
+        console.log('ProtectedRoute: No user found and no token. Redirecting to /login')
         return <Navigate to="/login" replace />
     }
 

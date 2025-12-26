@@ -18,7 +18,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         let mounted = true
-        console.log('AuthProvider: Mounted')
+
+        // HELPER: Check if URL has auth parameters (Magic Link, etc)
+        const hasAuthParams = () => {
+            const hash = window.location.hash
+            return hash && (hash.includes('access_token=') || hash.includes('type=recovery'))
+        }
+
+        console.log('AuthProvider: Mounted. Has hash token:', !!hasAuthParams())
 
         async function getInitialSession() {
             console.log('AuthProvider: Fetching initial session...')
@@ -33,10 +40,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     console.log('AuthProvider: Session found for user:', session.user.email)
                     setSession(session)
                     setUser(session.user)
-                } else {
+                    setLoading(false)
+                } else if (!hasAuthParams()) {
+                    // ONLY stop loading if there is NO token in URL
+                    // If there IS a token, we wait for onAuthStateChange to fire SIGNED_IN
                     console.log('AuthProvider: No initial session found')
+                    setLoading(false)
+                } else {
+                    console.log('AuthProvider: Token detected in URL, waiting for processing...')
                 }
-                setLoading(false)
             }
         }
 
