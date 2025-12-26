@@ -1,39 +1,35 @@
-'use client';
-
-import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Sparkles, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { Sparkles, Mail, ArrowRight, CheckCircle2 } from 'lucide-react'
 
 export default function LoginPage() {
-    const [email, setEmail] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [sent, setSent] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const supabase = createClient();
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [sent, setSent] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
 
         const { error } = await supabase.auth.signInWithOtp({
             email,
             options: {
-                emailRedirectTo: `${window.location.origin}/auth/callback`,
+                emailRedirectTo: `${window.location.origin}/`,
             },
-        });
+        })
 
         if (error) {
-            setError(error.message);
+            setError(error.message)
         } else {
-            setSent(true);
+            setSent(true)
         }
-        setLoading(false);
-    };
+        setLoading(false)
+    }
 
     return (
-        <div className="min-height-screen flex items-center justify-center p-6">
+        <div className="min-h-screen flex items-center justify-center p-6">
             <div className="glass-card w-full max-w-md p-8 text-center">
                 <div className="mb-6 flex justify-center">
                     <div className="bg-primary/20 p-4 rounded-2xl">
@@ -50,7 +46,9 @@ export default function LoginPage() {
                             <CheckCircle2 className="w-16 h-16 text-green-500" />
                         </div>
                         <h2 className="text-xl font-semibold">Check your email</h2>
-                        <p className="text-gray-400">We've sent a magic link to <span className="text-white">{email}</span>.</p>
+                        <p className="text-gray-400">
+                            We've sent a magic link to <span className="text-white">{email}</span>.
+                        </p>
                         <button
                             onClick={() => setSent(false)}
                             className="text-primary hover:underline text-sm font-medium"
@@ -98,5 +96,5 @@ export default function LoginPage() {
                 </p>
             </div>
         </div>
-    );
+    )
 }

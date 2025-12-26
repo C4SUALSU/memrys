@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #a855f7;
+  --color-background: #0a0a0f;
+}
+
+body {
+  @apply bg-background text-white antialiased;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* Glass Card */
+.glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-glass-border rounded-2xl;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply bg-primary hover:bg-primary/80 text-white font-medium py-3 px-6 rounded-xl transition-colors;
+}
+
+/* Input Fields */
+.input-field {
+  @apply bg-white/5 border border-glass-border rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50;
+}

@@ -43,6 +43,31 @@ Instead of dedicated API endpoints, the app uses **Server Actions** located in `
 ### Real-time Communication
 Chat messages leverages Supabase **Realtime** subscriptions to provide an instant messaging experience without a custom WebSocket server.
 
-## 4. Database & Scaling
+## 4. Hosting: Web Service vs. Static Site
+
+Memrys is currently designed as a **Dynamic Application**, which is why a **Web Service** (with a Node.js server) is recommended.
+
+### Comparison Table
+
+| Feature | Static Site (`output: export`) | Web Service (`next start`) |
+| :--- | :--- | :--- |
+| **Auth Type** | Client-side only | Server-side (SSR) & Client-side |
+| **Middleware** | ❌ Not supported | ✅ Required for Memrys (Route protection) |
+| **Server Actions** | ❌ Not supported | ✅ Recommended for Memrys (Mutations) |
+| **SSR / ISR** | ❌ No server-side logic | ✅ Full support for faster initial loads |
+| **Image Opt** | ❌ Needs `unoptimized` | ✅ Automatic optimization |
+| **Cost** | 🆓 Usually Free (Render Static) | 💰 Paid (Render Web Service) |
+
+### Why Memrys uses a Web Service:
+1.  **Middleware Security**: We use `src/middleware.ts` to check if you are logged in *before* the page even loads. In a static site, the page loads first, and then Javascript checks if you are logged in (causing a visible "flicker").
+2.  **Server Actions**: Your logic for handling Handshakes and Deletion Protocols is buried in Server Actions. These require a Node.js server to run.
+3.  **Supabase Auth (SSR)**: The `@supabase/ssr` package is designed to exchange session cookies securely. This is significantly more secure and robust than the client-only `supabase-js` approach.
+
+### If you want to use a Static Site anyway:
+1.  **Re-write Logic**: You must move all logic from `src/lib/actions` into client-side `useEffect` hooks and use the browser-only Supabase client.
+2.  **Remove Middleware**: Delete `src/middleware.ts` and manually add auth-check components to every single page.
+3.  **Config**: Restore the `output: 'export'` and `unoptimized: true` settings in `next.config.ts`.
+
+## 5. Database & Scaling
 - **RLS (Row Level Security)**: Every table has RLS policies enabled. Access is restricted based on the `partnership_id` and the user's active session.
 - **Migrations**: All schema changes must be documented in `supabase/migrations` to ensure environment consistency.
