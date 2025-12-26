@@ -14,6 +14,14 @@ export default function LoginPage() {
 
     useEffect(() => {
         console.log('LoginPage: Mounted. authLoading:', authLoading, 'User:', user?.email)
+
+        // Extract error from URL if present
+        const params = new URLSearchParams(window.location.search || window.location.hash.replace('#', '?'))
+        const urlError = params.get('error_description') || params.get('error')
+        if (urlError) {
+            setError(decodeURIComponent(urlError.replace(/\+/g, ' ')))
+        }
+
         if (!authLoading && user) {
             console.log('LoginPage: Authenticated user detected, redirecting to dashboard...')
             navigate('/', { replace: true })

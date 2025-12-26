@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const hasAuthParams = () => {
             const hash = window.location.hash
             const search = window.location.search
-            const found = (hash && (hash.includes('access_token=') || hash.includes('type=recovery'))) ||
+            const found = (hash && (hash.includes('access_token=') || hash.includes('type=recovery') || hash.includes('error='))) ||
                 (search && (search.includes('code=') || search.includes('error=')))
 
             console.log('AuthProvider: Checking params:', {
