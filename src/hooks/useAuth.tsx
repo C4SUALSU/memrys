@@ -22,7 +22,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // HELPER: Check if URL has auth parameters (Magic Link, etc)
         const hasAuthParams = () => {
             const hash = window.location.hash
-            return hash && (hash.includes('access_token=') || hash.includes('type=recovery'))
+            const search = window.location.search
+            return (hash && (hash.includes('access_token=') || hash.includes('type=recovery'))) ||
+                (search && (search.includes('code=') || search.includes('error=')))
         }
 
         console.log('AuthProvider: Mounted. Has hash token:', !!hasAuthParams())
