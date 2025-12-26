@@ -1,12 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { Sparkles, Mail, ArrowRight, CheckCircle2 } from 'lucide-react'
 
 export default function LoginPage() {
+    const { user, loading: authLoading } = useAuth()
+    const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const [sent, setSent] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!authLoading && user) {
+            navigate('/', { replace: true })
+        }
+    }, [user, authLoading, navigate])
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
