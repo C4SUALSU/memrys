@@ -1,13 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'export',
-  // Required to make <Image> work without a server
-  images: {
-    unoptimized: true,
-  },
-  // Optional: ensures /about/ becomes /about/index.html 
-  // (Fixes 404s on some static hosts)
-  trailingSlash: true,
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
 };
 
-module.exports = nextConfig;
+export default nextConfig;
