@@ -4,53 +4,62 @@ import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { Sparkles, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
 
-export default function LoginPage() {
+export default function SignupPage() {
     const { user, loading: authLoading } = useAuth()
     const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [success, setSuccess] = useState(false)
 
     useEffect(() => {
-        console.log('LoginPage: Mounted. authLoading:', authLoading, 'User:', user?.email)
-
-        // Extract error from URL if present
-        const params = new URLSearchParams(window.location.search || window.location.hash.replace('#', '?'))
-        const urlError = params.get('error_description') || params.get('error')
-        if (urlError) {
-            setError(decodeURIComponent(urlError.replace(/\+/g, ' ')))
-        }
-
+        console.log('SignupPage: Mounted. authLoading:', authLoading, 'User:', user?.email)
         if (!authLoading && user) {
-            console.log('LoginPage: Authenticated user detected, redirecting to dashboard...')
+            console.log('SignupPage: User already authenticated, redirecting to dashboard...')
             navigate('/dashboard', { replace: true })
         }
     }, [user, authLoading, navigate])
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault()
-        console.log('LoginPage: Attempting login for:', email)
-        setLoading(true)
+        console.log('SignupPage: Attempting signup for:', email)
         setError(null)
 
-        const { error } = await supabase.auth.signInWithPassword({
+        if (password !== confirmPassword) {
+            setError('Passwords do not match')
+            return
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters')
+            return
+        }
+
+        setLoading(true)
+
+        const { error } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                emailRedirectTo: `${window.location.origin}/dashboard`,
+            },
         })
 
         if (error) {
-            console.error('LoginPage: Login error:', error.message)
+            console.error('SignupPage: Signup error:', error.message)
             setError(error.message)
         } else {
-            console.log('LoginPage: Login successful')
+            console.log('SignupPage: Signup successful, confirmation email sent')
+            setSuccess(true)
         }
         setLoading(false)
     }
 
-    const handleGoogleLogin = async () => {
-        console.log('LoginPage: Initiating Google OAuth...')
+    const handleGoogleSignup = async () => {
+        console.log('SignupPage: Initiating Google OAuth...')
         setLoading(true)
         setError(null)
 
@@ -62,10 +71,32 @@ export default function LoginPage() {
         })
 
         if (error) {
-            console.error('LoginPage: Google OAuth error:', error.message)
+            console.error('SignupPage: Google OAuth error:', error.message)
             setError(error.message)
             setLoading(false)
         }
+    }
+
+    if (success) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-6">
+                <div className="glass-card w-full max-w-md p-8 text-center">
+                    <div className="mb-6 flex justify-center">
+                        <div className="bg-green-500/20 p-4 rounded-2xl">
+                            <Mail className="w-10 h-10 text-green-500" />
+                        </div>
+                    </div>
+                    <h1 className="text-2xl font-bold mb-2">Check your email</h1>
+                    <p className="text-gray-400 mb-6">
+                        We've sent a confirmation link to <span className="text-white">{email}</span>.
+                        Click the link to activate your account.
+                    </p>
+                    <Link to="/login" className="text-primary hover:underline font-medium">
+                        Back to Login
+                    </Link>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -76,14 +107,14 @@ export default function LoginPage() {
                         <Sparkles className="w-8 h-8 text-primary" />
                         <span className="font-bold text-2xl">Memrys</span>
                     </Link>
-                    <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
-                    <p className="text-gray-400">Log in to continue your story.</p>
+                    <h1 className="text-2xl font-bold mb-2">Create your account</h1>
+                    <p className="text-gray-400">Start your journey together.</p>
                 </div>
 
                 <div className="space-y-4">
-                    {/* Google Sign-In */}
+                    {/* Google Sign-Up */}
                     <button
-                        onClick={handleGoogleLogin}
+                        onClick={handleGoogleSignup}
                         disabled={loading}
                         className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-medium py-3 px-6 rounded-xl transition-colors"
                     >
@@ -103,7 +134,7 @@ export default function LoginPage() {
                     </div>
 
                     {/* Email/Password Form */}
-                    <form onSubmit={handleLogin} className="space-y-4">
+                    <form onSubmit={handleSignup} className="space-y-4">
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
@@ -135,6 +166,18 @@ export default function LoginPage() {
                             </button>
                         </div>
 
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Confirm Password"
+                                className="input-field w-full pl-12"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+
                         {error && (
                             <p className="text-red-400 text-sm bg-red-400/10 py-2 px-3 rounded-lg border border-red-400/20">
                                 {error}
@@ -150,7 +193,7 @@ export default function LoginPage() {
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    Log In <ArrowRight className="w-4 h-4" />
+                                    Create Account <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
                         </button>
@@ -158,9 +201,9 @@ export default function LoginPage() {
                 </div>
 
                 <p className="mt-8 text-center text-gray-400 text-sm">
-                    Don't have an account?{' '}
-                    <Link to="/signup" className="text-primary hover:underline font-medium">
-                        Sign Up
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-primary hover:underline font-medium">
+                        Log In
                     </Link>
                 </p>
             </div>

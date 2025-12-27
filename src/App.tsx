@@ -1,16 +1,20 @@
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/hooks/useAuth'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import LandingPage from '@/pages/Landing'
 import LoginPage from '@/pages/Login'
+import SignupPage from '@/pages/Signup'
 import DashboardPage from '@/pages/Dashboard'
 
 function App() {
     return (
         <AuthProvider>
             <Routes>
+                <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
                 <Route
-                    path="/"
+                    path="/dashboard"
                     element={
                         <ProtectedRoute>
                             <DashboardPage />
